@@ -12,6 +12,9 @@ namespace VirtualDesktopPet
 {
     public partial class PetForm : Form
     {
+        private bool isDragging = false;
+        private Point dragOffset;
+
         public PetForm()
         {
             InitializeComponent();
@@ -41,6 +44,41 @@ namespace VirtualDesktopPet
         }
         private void InitializeContextMenu()
         {
+        }
+
+        protected override void OnMouseDown(MouseEventArgs e)
+        {
+            base.OnMouseDown(e);
+            if (e.Button == MouseButtons.Left)
+            {
+                isDragging = true;
+                dragOffset = new Point(
+                    e.X,
+                    e.Y
+                );
+            }
+        }
+
+        protected override void OnMouseMove(MouseEventArgs e)
+        {
+            base.OnMouseMove(e);
+            if (isDragging)
+            {
+                Point screenPos = MousePosition;
+                this.Location = new Point(
+                    screenPos.X - dragOffset.X,
+                    screenPos.Y - dragOffset.Y
+                );
+            }
+        }
+
+        protected override void OnMouseUp(MouseEventArgs e)
+        {
+            base.OnMouseUp(e);
+            if (e.Button == MouseButtons.Left)
+            {
+                isDragging = false;
+            }
         }
 
         private void PetForm_Paint(object sender, PaintEventArgs e)
