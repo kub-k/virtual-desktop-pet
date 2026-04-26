@@ -14,6 +14,7 @@ namespace VirtualDesktopPet
     {
         private bool isDragging = false;
         private Point dragOffset;
+        private ContextMenuStrip contextMenu;
 
         public PetForm()
         {
@@ -42,8 +43,48 @@ namespace VirtualDesktopPet
 
             Location = new Point(500, 300);
         }
+
         private void InitializeContextMenu()
         {
+            contextMenu = new ContextMenuStrip();
+
+            ToolStripMenuItem settingsItem = new ToolStripMenuItem("Settings");
+            settingsItem.Click += SettingsItem_Click;
+
+            ToolStripMenuItem exitItem = new ToolStripMenuItem("Exit");
+            exitItem.Click += ExitItem_Click;
+
+            contextMenu.Items.Add(settingsItem);
+            contextMenu.Items.Add(exitItem);
+
+            this.ContextMenuStrip = contextMenu;
+        }
+
+        private void SettingsItem_Click(object sender, EventArgs e)
+        {
+            Form popup = new Form()
+            {
+                Width = 300,
+                Height = 120,
+                StartPosition = FormStartPosition.CenterScreen,
+                FormBorderStyle = FormBorderStyle.FixedToolWindow,
+                Text = "Virtual Desktop Pet"
+            };
+
+            Label label = new Label()
+            {
+                Dock = DockStyle.Fill,
+                Text = "Settings will be implemented later <3",
+                TextAlign = ContentAlignment.MiddleCenter
+            };
+
+            popup.Controls.Add(label);
+            popup.Show();
+        }
+
+        private void ExitItem_Click(object sender, EventArgs e)
+        {
+            Application.Exit();
         }
 
         protected override void OnMouseDown(MouseEventArgs e)
