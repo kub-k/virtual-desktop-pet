@@ -8,6 +8,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using VirtualDesktopPet.Models;
+using VirtualDesktopPet.Services;
 
 namespace VirtualDesktopPet
 {
@@ -18,20 +19,25 @@ namespace VirtualDesktopPet
 
         private ContextMenuStrip contextMenu;
 
-        private int movementSpeed = 5;
-        private int movementDirection = 1;
-
         private Timer updateTimer;
         private PetState currentState = PetState.Walking;
         private Random random = new Random();
 
+        private int movementSpeed;
+        private int movementDirection = 1;
+
         private int stateDurationCounter = 0;
-        private int stateChangeInterval = 120; // 120 / 2 ≈ 2 seconds
+        private int stateChangeInterval;
+
+        private PetConfig config;
+        private ConfigService configService;
 
         public PetForm()
         {
             InitializeComponent();
             ConfigureForm();
+
+            InitializeServices();
             InitializeContextMenu();
             InitializeGameLoop();
 
@@ -56,6 +62,18 @@ namespace VirtualDesktopPet
             DoubleBuffered = true;
 
             Location = new Point(500, 300);
+        }
+
+        private void InitializeServices()
+        {
+            configService = new ConfigService();
+            config = configService.LoadConfig();
+
+            if (config == null)
+                throw new Exception("Config could not be loaded!");
+
+            movementSpeed = config.MovementSpeed;
+            stateChangeInterval = config.StateChangeInterval;
         }
 
         private void InitializeContextMenu()
