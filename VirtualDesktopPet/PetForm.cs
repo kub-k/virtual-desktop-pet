@@ -1,12 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
 using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
+using VirtualDesktopPet.Core;
 using VirtualDesktopPet.Models;
 using VirtualDesktopPet.Services;
 
@@ -31,6 +26,9 @@ namespace VirtualDesktopPet
 
         private PetConfig config;
         private ConfigService configService;
+
+        private PetBehaviorManager behaviorManager;
+        private PetMovementManager movementManager;
 
         public PetForm()
         {
@@ -74,6 +72,14 @@ namespace VirtualDesktopPet
 
             movementSpeed = config.MovementSpeed;
             stateChangeInterval = config.StateChangeInterval;
+
+            behaviorManager = new PetBehaviorManager(
+                config.WalkChance,
+                config.SitChance,
+                config.SleepChance
+            );
+
+            movementManager = new PetMovementManager();
         }
 
         private void InitializeContextMenu()
@@ -117,37 +123,78 @@ namespace VirtualDesktopPet
                 stateDurationCounter = 0;
             }
 
+            movementManager.Update();
+
             if (currentState == PetState.Walking)
             {
-                this.Left += movementSpeed * movementDirection;
+                int speed = movementManager.GetFinalSpeed(movementSpeed);
 
-                if (this.Left <= 0)
+                switch (movementManager.CurrentDirection)
                 {
-                    movementDirection = 1;
+                    case Direction.Left:
+                        this.Left -= speed;
+                        break;
+
+                    case Direction.Right:
+                        this.Left += speed;
+                        break;
+
+                    case Direction.Up:
+                        this.Top -= speed;
+                        break;
+
+                    case Direction.Down:
+                        this.Top += speed;
+                        break;
                 }
 
-                if (this.Right >= Screen.PrimaryScreen.WorkingArea.Width)
-                {
-                    movementDirection = -1;
-                }
+                KeepInsideScreen();
             }
         }
 
         private void ChangePetState()
         {
-            int randomValue = random.Next(1, 101);
+            currentState = behaviorManager.GetNextState();
+        }
 
-            if (randomValue <= 50)
+        private void KeepInsideScreen()
+        {
+            Rectangle area = Screen.PrimaryScreen.WorkingArea;
+
+            bool bounced = false;
+
+            if (this.Left < area.Left)
             {
-                currentState = PetState.Walking;
+                this.Left = area.Left;
+                movementManager.SetDirection(Direction.Right);
+                bounced = true;
             }
-            else if (randomValue <= 80)
+
+            if (this.Right > area.Right)
             {
-                currentState = PetState.Sitting;
+                this.Left = area.Right - this.Width;
+                movementManager.SetDirection(Direction.Left);
+                bounced = true;
             }
-            else
+
+            if (this.Top < area.Top)
             {
-                currentState = PetState.Sleeping;
+                this.Top = area.Top;
+                movementManager.SetDirection(Direction.Down);
+                bounced = true;
+            }
+
+            if (this.Bottom > area.Bottom)
+            {
+                this.Top = area.Bottom - this.Height;
+                movementManager.SetDirection(Direction.Up);
+                bounced = true;
+            }
+
+            // extra safety: jitter prevention
+            if (bounced)
+            {
+                stateDurationCounter += 5;
             }
         }
 

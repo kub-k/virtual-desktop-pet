@@ -49,6 +49,9 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Core\PetBehaviorManager.cs" />
+    <Compile Include="Core\PetMovementManager.cs" />
+    <Compile Include="Models\Direction.cs" />
     <Compile Include="Models\PetConfig.cs" />
     <Compile Include="Models\PetState.cs" />
     <Compile Include="PetForm.cs">
