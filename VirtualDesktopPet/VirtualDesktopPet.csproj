@@ -46,6 +46,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Models\PetState.cs" />
     <Compile Include="PetForm.cs">
       <SubType>Form</SubType>
     </Compile>

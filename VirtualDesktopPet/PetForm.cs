@@ -7,6 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using VirtualDesktopPet.Models;
 
 namespace VirtualDesktopPet
 {
@@ -14,13 +15,26 @@ namespace VirtualDesktopPet
     {
         private bool isDragging = false;
         private Point dragOffset;
+
         private ContextMenuStrip contextMenu;
+
+        private int movementSpeed = 5;
+        private int movementDirection = 1;
+
+        private Timer updateTimer;
+        private PetState currentState = PetState.Walking;
+        private Random random = new Random();
+
+        private int stateDurationCounter = 0;
+        private int stateChangeInterval = 120; // 120 / 2 ≈ 2 seconds
 
         public PetForm()
         {
             InitializeComponent();
             ConfigureForm();
             InitializeContextMenu();
+            InitializeGameLoop();
+
             this.Paint += PetForm_Paint;
         }
         private void ConfigureForm()
@@ -30,8 +44,8 @@ namespace VirtualDesktopPet
             FormBorderStyle = FormBorderStyle.None;
             StartPosition = FormStartPosition.Manual;
 
-            Width = 300;
-            Height = 300;
+            Width = 120;
+            Height = 120;
 
             TopMost = true;
             ShowInTaskbar = true;
@@ -58,6 +72,65 @@ namespace VirtualDesktopPet
             contextMenu.Items.Add(exitItem);
 
             this.ContextMenuStrip = contextMenu;
+        }
+
+        private void InitializeGameLoop()
+        {
+            updateTimer = new Timer();
+            updateTimer.Interval = 16; // 1000 / 16 ≈ 60 FPS
+
+            updateTimer.Tick += UpdateTimer_Tick;
+            updateTimer.Start();
+        }
+
+        private void UpdateTimer_Tick(object sender, EventArgs e)
+        {
+            UpdatePet();
+            Invalidate();
+        }
+
+        private void UpdatePet()
+        {
+            stateDurationCounter++;
+
+            if (stateDurationCounter >= stateChangeInterval)
+            {
+                ChangePetState();
+                stateDurationCounter = 0;
+            }
+
+            if (currentState == PetState.Walking)
+            {
+                this.Left += movementSpeed * movementDirection;
+
+                if (this.Left <= 0)
+                {
+                    movementDirection = 1;
+                }
+
+                if (this.Right >= Screen.PrimaryScreen.WorkingArea.Width)
+                {
+                    movementDirection = -1;
+                }
+            }
+        }
+
+        private void ChangePetState()
+        {
+            int randomValue = random.Next(1, 101);
+
+            if (randomValue <= 50)
+            {
+                currentState = PetState.Walking;
+            }
+            else if (randomValue <= 80)
+            {
+                currentState = PetState.Sitting;
+            }
+            else
+            {
+                currentState = PetState.Sleeping;
+            }
         }
 
         private void SettingsItem_Click(object sender, EventArgs e)
@@ -125,12 +198,38 @@ namespace VirtualDesktopPet
         private void PetForm_Paint(object sender, PaintEventArgs e)
         {
             Graphics g = e.Graphics;
-            using (Brush brush = new SolidBrush(Color.LightPink))
+
+            Color petColor;
+
+            switch (currentState)
+            {
+                case PetState.Walking:
+                    petColor = Color.LightGreen;
+                    break;
+                case PetState.Sitting:
+                    petColor = Color.LightYellow;
+                    break;
+                case PetState.Sleeping:
+                    petColor = Color.LightSkyBlue;
+                    break;
+                default:
+                    petColor = Color.LightPink;
+                    break;
+            }
+
+            using (Brush brush = new SolidBrush(petColor))
             {
                 int size = 80;
                 int x = (this.ClientSize.Width - size) / 2;
                 int y = (this.ClientSize.Height - size) / 2;
-                g.FillRectangle(brush, x, y, size, size);
+
+                g.FillRectangle(
+                     brush,
+                     x,
+                     y,  
+                     size,
+                     size
+                 );
             }
         }
 
