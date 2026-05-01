@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Drawing;
+using System.IO;
+using System.Linq;
 using System.Windows.Forms;
 using VirtualDesktopPet.Core;
 using VirtualDesktopPet.Models;
@@ -29,6 +31,7 @@ namespace VirtualDesktopPet
 
         private PetBehaviorManager behaviorManager;
         private PetMovementManager movementManager;
+        private SpriteManager spriteManager;
 
         public PetForm()
         {
@@ -54,8 +57,8 @@ namespace VirtualDesktopPet
             TopMost = true;
             ShowInTaskbar = true;
 
-            BackColor = Color.Lime;
-            TransparencyKey = Color.Lime;
+            BackColor = Color.Black;
+            TransparencyKey = Color.Black;
 
             DoubleBuffered = true;
 
@@ -80,6 +83,45 @@ namespace VirtualDesktopPet
             );
 
             movementManager = new PetMovementManager();
+
+            string basePath = AppDomain.CurrentDomain.BaseDirectory;
+            PetSpriteSet set = new PetSpriteSet
+            {
+                WalkRight = LoadSpritesFromFolder(@"Assets\Cat\Walk\Right"),
+                WalkLeft = LoadSpritesFromFolder(@"Assets\Cat\Walk\Left"),
+                WalkUp = LoadSpritesFromFolder(@"Assets\Cat\Walk\Up"),
+                WalkDown = LoadSpritesFromFolder(@"Assets\Cat\Walk\Down"),
+
+                Sit = LoadSpritesFromFolder(@"Assets\Cat\Sit"),
+                Sleep = LoadSpritesFromFolder(@"Assets\Cat\Sleep")
+            };
+
+            spriteManager = new SpriteManager(set);
+        }
+
+        private Image[] LoadSpritesFromFolder(string folderPath)
+        {
+
+            string fullPath = Path.Combine(
+                AppDomain.CurrentDomain.BaseDirectory,
+                folderPath
+            );
+
+            if (!Directory.Exists(fullPath))
+                return new Image[0];
+
+            var files = Directory.GetFiles(fullPath, "*.png")
+                                 .OrderBy(f => f)
+                                 .ToArray();
+
+            return files.Select(f => Image.FromFile(f)).ToArray();
+        }
+
+        private Image MakeTransparent(Image img)
+        {
+            Bitmap bmp = new Bitmap(img);
+            bmp.MakeTransparent(Color.Lime);
+            return bmp;
         }
 
         private void InitializeContextMenu()
@@ -264,38 +306,9 @@ namespace VirtualDesktopPet
         {
             Graphics g = e.Graphics;
 
-            Color petColor;
+            Image frame = spriteManager.GetCurrentFrame(currentState, movementManager.CurrentDirection);
 
-            switch (currentState)
-            {
-                case PetState.Walking:
-                    petColor = Color.LightGreen;
-                    break;
-                case PetState.Sitting:
-                    petColor = Color.LightYellow;
-                    break;
-                case PetState.Sleeping:
-                    petColor = Color.LightSkyBlue;
-                    break;
-                default:
-                    petColor = Color.LightPink;
-                    break;
-            }
-
-            using (Brush brush = new SolidBrush(petColor))
-            {
-                int size = 80;
-                int x = (this.ClientSize.Width - size) / 2;
-                int y = (this.ClientSize.Height - size) / 2;
-
-                g.FillRectangle(
-                     brush,
-                     x,
-                     y,  
-                     size,
-                     size
-                 );
-            }
+            g.DrawImage(frame, new Rectangle(0, 0, this.Width, this.Height));
         }
 
         private void PetForm_Load(object sender, EventArgs e)

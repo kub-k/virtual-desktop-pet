@@ -51,8 +51,10 @@
   <ItemGroup>
     <Compile Include="Core\PetBehaviorManager.cs" />
     <Compile Include="Core\PetMovementManager.cs" />
+    <Compile Include="Core\SpriteManager.cs" />
     <Compile Include="Models\Direction.cs" />
     <Compile Include="Models\PetConfig.cs" />
+    <Compile Include="Models\PetSpriteSet.cs" />
     <Compile Include="Models\PetState.cs" />
     <Compile Include="PetForm.cs">
       <SubType>Form</SubType>
@@ -76,7 +78,7 @@
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
     <None Include="Config\settings.json">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Include="packages.config" />
     <None Include="Properties\Settings.settings">
