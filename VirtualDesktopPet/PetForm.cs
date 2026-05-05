@@ -128,6 +128,10 @@ namespace VirtualDesktopPet
         {
             contextMenu = new ContextMenuStrip();
 
+            contextMenu.ShowImageMargin = false;
+            contextMenu.BackColor = Color.FromArgb(30, 30, 30);
+            contextMenu.ForeColor = Color.White;
+
             ToolStripMenuItem settingsItem = new ToolStripMenuItem("Settings");
             settingsItem.Click += SettingsItem_Click;
 
@@ -135,6 +139,7 @@ namespace VirtualDesktopPet
             exitItem.Click += ExitItem_Click;
 
             contextMenu.Items.Add(settingsItem);
+            contextMenu.Items.Add(new ToolStripSeparator());
             contextMenu.Items.Add(exitItem);
 
             this.ContextMenuStrip = contextMenu;
