@@ -6,6 +6,7 @@ using System.Windows.Forms;
 using VirtualDesktopPet.Core;
 using VirtualDesktopPet.Models;
 using VirtualDesktopPet.Services;
+using VirtualDesktopPet.UI;
 
 namespace VirtualDesktopPet
 {
@@ -32,6 +33,8 @@ namespace VirtualDesktopPet
         private PetBehaviorManager behaviorManager;
         private PetMovementManager movementManager;
         private SpriteManager spriteManager;
+
+        private SettingsForm settingsForm;
 
         public PetForm()
         {
@@ -129,7 +132,7 @@ namespace VirtualDesktopPet
             contextMenu = new ContextMenuStrip();
 
             contextMenu.ShowImageMargin = false;
-            contextMenu.BackColor = Color.FromArgb(30, 30, 30);
+            contextMenu.BackColor = Color.FromArgb(147, 95, 55);
             contextMenu.ForeColor = Color.White;
 
             ToolStripMenuItem settingsItem = new ToolStripMenuItem("Settings");
@@ -247,24 +250,33 @@ namespace VirtualDesktopPet
 
         private void SettingsItem_Click(object sender, EventArgs e)
         {
-            Form popup = new Form()
+            if (settingsForm == null || settingsForm.IsDisposed)
             {
-                Width = 300,
-                Height = 120,
-                StartPosition = FormStartPosition.CenterScreen,
-                FormBorderStyle = FormBorderStyle.FixedToolWindow,
-                Text = "Virtual Desktop Pet"
-            };
-
-            Label label = new Label()
+                settingsForm = new SettingsForm(config);
+                settingsForm.OnSettingsSaved += SettingsForm_OnSettingsSaved;
+                settingsForm.Show();
+            }
+            else
             {
-                Dock = DockStyle.Fill,
-                Text = "Settings will be implemented later <3",
-                TextAlign = ContentAlignment.MiddleCenter
-            };
+                settingsForm.BringToFront();
+                settingsForm.Focus();
+            }
+        }
 
-            popup.Controls.Add(label);
-            popup.Show();
+        private void SettingsForm_OnSettingsSaved(PetConfig newConfig)
+        {
+            config = newConfig;
+
+            movementSpeed = config.MovementSpeed;
+            stateChangeInterval = config.StateChangeInterval;
+
+            behaviorManager = new PetBehaviorManager(
+                config.WalkChance,
+                config.SitChance,
+                config.SleepChance
+            );
+
+            stateDurationCounter = 0;
         }
 
         private void ExitItem_Click(object sender, EventArgs e)

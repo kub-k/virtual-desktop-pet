@@ -27,5 +27,24 @@ namespace VirtualDesktopPet.Services
 
             return config;
         }
+
+        public void SaveConfig(PetConfig config)
+        {
+            try
+            {
+                string configDir = Path.GetDirectoryName(configPath);
+                if (!Directory.Exists(configDir))
+                {
+                    Directory.CreateDirectory(configDir);
+                }
+
+                string jsonContent = JsonConvert.SerializeObject(config, Formatting.Indented);
+                File.WriteAllText(configPath, jsonContent);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception($"Error saving config: {ex.Message}", ex);
+            }
+        }
     }
 }
