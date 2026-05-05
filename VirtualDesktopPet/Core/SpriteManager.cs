@@ -1,6 +1,5 @@
 ﻿using System.Drawing;
 using VirtualDesktopPet.Models;
-using VirtualDesktopPet.Models;
 
 namespace VirtualDesktopPet.Core
 {

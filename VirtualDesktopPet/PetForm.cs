@@ -120,13 +120,6 @@ namespace VirtualDesktopPet
             return files.Select(f => Image.FromFile(f)).ToArray();
         }
 
-        private Image MakeTransparent(Image img)
-        {
-            Bitmap bmp = new Bitmap(img);
-            bmp.MakeTransparent(Color.Lime);
-            return bmp;
-        }
-
         private void InitializeContextMenu()
         {
             contextMenu = new ContextMenuStrip();
