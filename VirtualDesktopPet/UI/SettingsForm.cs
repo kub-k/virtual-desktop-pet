@@ -58,6 +58,7 @@ namespace VirtualDesktopPet.UI
 
             this.BackColor = darkBg;
             this.ForeColor = textColor;
+            this.Icon = new Icon("Assets/app-icon.ico");
 
             // Create panel
             TableLayoutPanel mainPanel = new TableLayoutPanel

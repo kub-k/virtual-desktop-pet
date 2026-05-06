@@ -50,6 +50,7 @@ namespace VirtualDesktopPet
         private void ConfigureForm()
         {
             this.Text = "Virtual Desktop Pet";
+            this.Icon = new Icon("Assets/app-icon.ico");
 
             FormBorderStyle = FormBorderStyle.None;
             StartPosition = FormStartPosition.Manual;
