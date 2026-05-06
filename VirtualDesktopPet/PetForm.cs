@@ -138,6 +138,9 @@ namespace VirtualDesktopPet
             contextMenu.Items.Add(new ToolStripSeparator());
             contextMenu.Items.Add(exitItem);
 
+            contextMenu.Opening += ContextMenu_Opening;
+            contextMenu.Closing += ContextMenu_Closing;
+
             this.ContextMenuStrip = contextMenu;
         }
 
@@ -275,6 +278,18 @@ namespace VirtualDesktopPet
         private void ExitItem_Click(object sender, EventArgs e)
         {
             Application.Exit();
+        }
+
+        private void ContextMenu_Opening(object sender, System.ComponentModel.CancelEventArgs e)
+        {
+            // Pause game when context menu opens
+            updateTimer.Stop();
+        }
+
+        private void ContextMenu_Closing(object sender, System.Windows.Forms.ToolStripDropDownClosingEventArgs e)
+        {
+            // Resume game when context menu closes
+            updateTimer.Start();
         }
 
         protected override void OnMouseDown(MouseEventArgs e)
