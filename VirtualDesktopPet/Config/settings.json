@@ -2,8 +2,8 @@
 {
     "MovementSpeed": 3,
     "StateChangeInterval": 120, // 120 / 60 ≈ 2 seconds
-    "WalkChance": 50,
-    "SitChance": 30,
-    "SleepChance": 20,
+    "WalkChance": 10,
+    "SitChance": 20,
+    "SleepChance": 70,
     "SelectedMonitorIndex": 0   // primary monitor
 }
